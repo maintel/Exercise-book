@@ -7,7 +7,9 @@ class TreeNode {
 }
 
 void main(List<String> args) {
-  print(test(6));
+  TreeNode treeNode = TreeNode(1, TreeNode(4), TreeNode(2, null, TreeNode(3)));
+  print(preorderTraversal2(treeNode));
+  print(preorderTraversal3(treeNode));
 }
 
 List<int> test(int n) {
@@ -54,37 +56,56 @@ List<int> preorderTraversal(TreeNode? root) {
   return preorder;
 }
 
+// 迭代算法的要点在于如何在某个子节点遍历完以后找到它的前序节点，思路就是用一个list存起来。
+
 // 迭代算法
+// 这个算法的思路就是用一个list从跟节点开始把右、左节点入栈，然后读取栈顶的节点同时把栈顶节点出栈，同时把栈顶节点的右、左节点入栈，
+// 以此类推每次读栈顶的元素就是先从左节点读取的，直到栈为空表示读取完了。
 List<int> preorderTraversal2(TreeNode? root) {
   if (root == null) {
     return [];
   }
   List<int> preorder = [];
+  // 添加跟节点
   preorder.add(root.val);
-  // 右节点表示root树的父节点，左节点表示当前遍历的节点
-  TreeNode temp = TreeNode();
-  temp.right = root;
-  temp.left = root.left;
-  while (temp.left != null || temp.right != null) {
-    // 如果左节点不为空
-    preorder.add(temp.left!.val);
-    // 如果下一个左节点不为空
-    if (temp.left!.left != null) {
-      // 移动右节点为当前节点
-      temp.right = temp.left;
-      // 左节点为遍历节点
-      temp.left = temp.left!.left;
-      preorder.add(temp.left!.val);
-    } else if (temp.left!.right != null) {
-      //否则判断下一个右节点是否为空
-      temp.right = temp.left;
-      temp.left = temp.left!.right;
-      preorder.add(temp.left!.val);
-    } else {
-      // 否则向回退
-      temp = temp.right!;
-      temp.left = temp.right;
+  List<TreeNode?> stack = [];
+  // 先入栈右节点，再入栈左节点，这样能保证倒序读取 stack 时先读到做节点
+  stack.add(root.right);
+  stack.add(root.left);
+
+  while (stack.length != 0) {
+    TreeNode? temp = stack.last;
+    stack.removeLast();
+    if (temp != null) {
+      preorder.add(temp.val);
+      print(temp.val);
+      stack.add(temp.right);
+      stack.add(temp.left);
     }
+  }
+
+  return preorder;
+}
+
+// 这里的思路是先把所有左节点入栈，然后出栈根据读取栈顶节点的右节点，
+// 然后在此把栈顶节点所有子节点的左节点入栈，
+// 以此类推直到遍历完所有节点 不如 preorderTraversal2 好
+List<int> preorderTraversal3(TreeNode? root) {
+  if (root == null) {
+    return [];
+  }
+  List<int> preorder = [];
+  List<TreeNode?> stack = [];
+  TreeNode? key = root;
+  while (key != null || stack.length != 0) {
+    while (key != null) {
+      preorder.add(key.val);
+      stack.add(key);
+      key = key.left;
+    }
+    var temp = stack.last;
+    stack.removeLast();
+    key = temp?.right;
   }
 
   return preorder;
