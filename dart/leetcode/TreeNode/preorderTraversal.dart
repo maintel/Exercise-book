@@ -1,10 +1,6 @@
 //Definition for a binary tree node.
-class TreeNode {
-  int val;
-  TreeNode? left;
-  TreeNode? right;
-  TreeNode([this.val = 0, this.left, this.right]);
-}
+
+import 'treeNode.dart';
 
 void main(List<String> args) {
   TreeNode treeNode = TreeNode(1, TreeNode(4), TreeNode(2, null, TreeNode(3)));
